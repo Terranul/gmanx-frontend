@@ -7,11 +7,15 @@
 import SwiftUI
 import GoogleSignIn
 import GoogleSignInSwift
+import Foundation
+import Observation
 
-
+@Observable
 class UserViewModel {
     
     var didRegister: Bool = false
+    var userService: UserService = UserService()
+    var registrationError: String? = nil
     
     func googleSignIn() async {
         guard let rootViewController = UIApplication.shared.rootViewController else {
@@ -24,9 +28,14 @@ class UserViewModel {
             await UserInfo.shared.setAuthToken(result.user.accessToken.tokenString)
             await UserInfo.shared.setGmail(result.user.userID!)
             await UserInfo.shared.setRefreshToken(result.user.refreshToken.tokenString)
-            UIApplication.shared.registerForRemoteNotifications()
+            try await userService.registerUser()
+            print("will run did register")
+            self.didRegister = true
+        } catch UserError.RegistrationError(let message) {
+            print("threw and errror: " + message)
+            registrationError = message
         } catch {
-            debugPrint("error with google sign in")
+            fatalError("This was not supposed to happen (UserViewModel:35)")
         }
     }
     

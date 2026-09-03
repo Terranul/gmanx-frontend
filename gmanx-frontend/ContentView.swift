@@ -8,21 +8,29 @@
 import GoogleSignIn
 import GoogleSignInSwift
 import SwiftUI
+import Observation
 
 
 struct ContentView: View {
     
-    let userViewModel = UserViewModel()
+    
+    @State var userViewModel = UserViewModel()
     
     var body: some View {
-        VStack {
-            GoogleSignInButton {
-                Task {
-                    await userViewModel.googleSignIn()
+        NavigationStack {
+            if (userViewModel.didRegister) {
+                LandingPage()
+            } else {
+                VStack {
+                    GoogleSignInButton {
+                        Task {
+                            await userViewModel.googleSignIn()
+                        }
+                    }
                 }
+                .padding()
             }
         }
-        .padding()
     }
 }
 

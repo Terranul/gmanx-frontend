@@ -8,7 +8,7 @@
 import Foundation
 
 func getBackendRequest(path: String) async -> URLRequest{
-    var request = URLRequest(url: URL(string: "https://emanx-backend.onrender.com/\(path)")!)
+    var request = URLRequest(url: URL(string: "https://emanx-backend.onrender.com/v1/\(path)")!)
     request.httpMethod = "POST"
     request.setValue(await UserInfo.shared.gmail, forHTTPHeaderField: "gmail")
     request.setValue("application/json", forHTTPHeaderField: "Content-Type")

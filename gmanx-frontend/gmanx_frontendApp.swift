@@ -1,10 +1,3 @@
-//
-//  gmanx_frontendApp.swift
-//  gmanx-frontend
-//
-//  Created by Ben Faraone on 2026-08-21.
-//
-
 import GoogleSignInSwift
 
 extension UIApplication {
