@@ -13,22 +13,18 @@ enum UserError: Error {
 
 class UserService {
     
-    func registerUser() async throws {
-        let userInfo = UserInfo.shared
-        if let gmail = await userInfo.gmail, let gmailAuthToken = await userInfo.gmailAuthToken, let refreshToken = await userInfo.refreshToken {
-            var request = await getBackendRequest(path: "register")
-            let body = ["authToken": gmailAuthToken, "refreshToken": refreshToken, "gmail": gmail]
-            request.httpBody = try JSONSerialization.data(withJSONObject: body)
-            let (data, response) = try await URLSession.shared.data(for: request)
-            print(String(data: data, encoding: .utf8)!)
-            guard let httpResponse = response as? HTTPURLResponse else {
-                throw UserError.RegistrationError("Not an http response")
-            }
-            if (httpResponse.statusCode != 202) {
-                throw UserError.RegistrationError("Please try to sign in again")
-            }
-        } else {
-            debugPrint("not all user info has been completed")
+    func registerUser(user: UserInfo, gmail: String) async throws {
+        var request = await getBackendRequest(path: "users/emails/\(gmail)")
+        request.httpMethod = "PUT"
+        let body = try JSONEncoder().encode(user)
+        request.httpBody = body
+        let (data, response) = try await URLSession.shared.data(for: request)
+        print(String(data: data, encoding: .utf8)!)
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw UserError.RegistrationError("Not an http response")
+        }
+        if (httpResponse.statusCode != 200) {
+            throw UserError.RegistrationError("Please try to sign in again")
         }
     }
 }

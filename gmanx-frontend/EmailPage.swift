@@ -9,11 +9,21 @@ import SwiftUI
 
 struct EmailPage: View {
     
+    @State var emailViewModel = EmailViewModel()
+    
     
     
     var body: some View {
         VStack {
             Text("My Emails")
+            Text("New Emails")
+            ForEach(emailViewModel.getEmailByStatus(.new), id: \.self) { email in
+                EmailCardView(pair: email)
+            }
+            Text("Ongoing Emails")
+            ForEach(emailViewModel.getEmailByStatus(.ongoing(-1)), id: \.self) { email in
+                EmailCardView(pair: email)
+            }
             
         }
     }
@@ -21,19 +31,11 @@ struct EmailPage: View {
 
 struct EmailCardView: View {
     
-    let emailResponse: EmailResponse
+    let pair: EmailPair
     
     var body: some View {
         HStack {
-            VStack(alignment: .leading) {
-                Text(emailResponse.email.subject)
-                    .fontWeight(.bold)
-                    .font(.system(size: 20))
-                Text(emailResponse.email.from)
-                    .fontWeight(.light)
-                    .font(.system(size: 10))
-            }
-            switch(emailResponse.status) {
+            switch(pair.stage) {
             case .new:
                 Circle()
                     .fill(.green)
@@ -43,6 +45,14 @@ struct EmailCardView: View {
             default:
                 Circle()
                     .fill(.gray)
+            }
+            VStack(alignment: .leading) {
+                Text(pair.email.body.subject)
+                    .fontWeight(.bold)
+                    .font(.system(size: 20))
+                Text(pair.email.body.from)
+                    .fontWeight(.light)
+                    .font(.system(size: 10))
             }
         }
     }

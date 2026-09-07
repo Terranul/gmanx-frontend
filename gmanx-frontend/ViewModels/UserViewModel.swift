@@ -24,11 +24,10 @@ class UserViewModel {
         }
         do {
             let result = try await GIDSignIn.sharedInstance.signIn(withPresenting: rootViewController, hint: nil, additionalScopes: ["https://mail.google.com/"])
+            let user = UserInfo(authToken: result.user.accessToken.tokenString, refreshToken: result.user.refreshToken.tokenString)
+            print("email:" + result.user.profile!.email)
             // should be fine since never calling from the main thread
-            await UserInfo.shared.setAuthToken(result.user.accessToken.tokenString)
-            await UserInfo.shared.setGmail(result.user.userID!)
-            await UserInfo.shared.setRefreshToken(result.user.refreshToken.tokenString)
-            try await userService.registerUser()
+            try await userService.registerUser(user: user, gmail: result.user.profile!.email)
             print("will run did register")
             self.didRegister = true
         } catch UserError.RegistrationError(let message) {
