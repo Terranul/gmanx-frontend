@@ -10,6 +10,21 @@ enum Status: Hashable {
     case ongoing(Int)
     case complete
     
+    static func == (lhs: Status, rhs: Status) -> Bool {
+        return lhs.hashValue == rhs.hashValue
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        switch(self) {
+        case .new:
+            hasher.combine(1)
+        case .ongoing(_):
+            hasher.combine(2)
+        case .complete:
+            hasher.combine(3)
+        }
+    }
+
     init(stage: Int) {
         // TODO add .complete case
         if (stage <= 0) {
@@ -47,7 +62,7 @@ struct EmailPair: Decodable, Hashable {
     }
     
     let stage: Status
-    let draftId: String
+    let draftId: String?
     let email: EmailReceipt
 }
 
@@ -58,6 +73,21 @@ struct EmailReceipt: Decodable, Hashable {
 }
 
 struct Email: Decodable, Hashable {
+    
+    init() {
+        self.body = ""
+        self.to = ""
+        self.from = ""
+        self.subject = ""
+    }
+    
+    init(body: String, to: String, from: String, subject: String) {
+        self.body = body
+        self.to = to
+        self.from = from
+        self.subject = subject
+    }
+    
     let body: String
     let to: String
     let from: String

@@ -6,6 +6,9 @@
 //
 
 import Foundation
+import SwiftUI
+import GoogleSignIn
+import GoogleSignInSwift
 
 enum UserError: Error {
     case RegistrationError(String)
@@ -23,8 +26,21 @@ class UserService {
         guard let httpResponse = response as? HTTPURLResponse else {
             throw UserError.RegistrationError("Not an http response")
         }
-        if (httpResponse.statusCode != 200) {
-            throw UserError.RegistrationError("Please try to sign in again")
+//        if (httpResponse.statusCode != 200) {
+//            throw UserError.RegistrationError("Please try to sign in again")
+//        }
+    }
+    
+    func getSignInResult() async throws -> GIDGoogleUser {
+        guard let rootViewController = UIApplication.shared.rootViewController else {
+            // Handle error
+            fatalError("Could not find the root view")
+        }
+        do {
+            // attempt to restore previous sign in
+            return try await GIDSignIn.sharedInstance.restorePreviousSignIn()
+        } catch {
+            return try await GIDSignIn.sharedInstance.signIn(withPresenting: rootViewController, hint: nil, additionalScopes: ["https://mail.google.com/"]).user
         }
     }
 }

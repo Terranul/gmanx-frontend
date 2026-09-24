@@ -18,16 +18,15 @@ class UserViewModel {
     var registrationError: String? = nil
     
     func googleSignIn() async {
-        guard let rootViewController = UIApplication.shared.rootViewController else {
-            // Handle error
-            return
-        }
         do {
-            let result = try await GIDSignIn.sharedInstance.signIn(withPresenting: rootViewController, hint: nil, additionalScopes: ["https://mail.google.com/"])
-            let user = UserInfo(authToken: result.user.accessToken.tokenString, refreshToken: result.user.refreshToken.tokenString)
-            print("email:" + result.user.profile!.email)
+            // try to restore the sign in first
+            let result = try await userService.getSignInResult()
+            let user = UserInfo(authToken: result.accessToken.tokenString, refreshToken: result.refreshToken.tokenString)
+            print("email:" + result.profile!.email)
+            print("access token " + user.authToken)
+            print("refresh token " + user.refreshToken)
             // should be fine since never calling from the main thread
-            try await userService.registerUser(user: user, gmail: result.user.profile!.email)
+            try await userService.registerUser(user: user, gmail: result.profile!.email)
             print("will run did register")
             self.didRegister = true
         } catch UserError.RegistrationError(let message) {
@@ -37,7 +36,6 @@ class UserViewModel {
             fatalError("This was not supposed to happen (UserViewModel:35)")
         }
     }
-    
     
     
     

@@ -7,7 +7,7 @@
 
 import Foundation
 
-func getBackendRequest(path: String) async -> URLRequest{
+func getBackendRequest(path: String) -> URLRequest{
     var request = URLRequest(url: URL(string: "https://emanx-backend.onrender.com/v1/\(path)")!)
     request.httpMethod = "POST"
     request.setValue("application/json", forHTTPHeaderField: "Content-Type")
